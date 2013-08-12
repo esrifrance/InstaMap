@@ -1,13 +1,12 @@
-
 <!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
-    <title>StreamLayer Using GEP</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9,IE=10">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>StreamLayer using ArcGIS API for JavaScript and ArcGIS GeoEvent Processor for Server</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/dojo/dijit/themes/tundra/tundra.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
-    <link rel="stylesheet" href="ttp://js.arcgis.com/3.6/js/dojo/dijit/themes/tundra/tundra.css">
     <style type="text/css">
       html, body {
         height: 100%; width: 100%;
@@ -19,208 +18,114 @@
       }
       #map {
         width: 100%;
-        height: 100%;
-        background:rgb(80,80,80);
-      }
-      #controls {
-        position:absolute;
-        top:18px;
-        left:100px;
-        width:300px;
-      }
-      #controls input {
-        padding:10px;
-        color:#FEFEFE;
-        background:#444;
-        border:none;
-      }
-      #controls input:hover {
-        background: #333;
-        color: #fff;
-        cursor:pointer;
-      }
-      #socket {
-        display:none;
-      }
-      .esriSimpleSlider div  {
-        width: 36px;
-        height: 31px;
-        font-size: 24px;
-        font-family: verdana,helvetica;
-        font-weight: bold;
-        line-height: 25px;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        float: right;
-        border: 1px solid #555;
-      }
-      .esriSimpleSlider {
-        position: absolute;
-        text-align: center;
-        background-color: #444;
-        color: #FEFEFE;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        border: none;
-        border-radius:none;
-      }
-      .esriSimpleSliderVertical .esriSimpleSliderIncrementButton {
-        border-bottom: 1px solid #555;
+        height: 80%;
       }
 
     </style>
-    <script>
-     var dojoConfig = {
-        locale: "en",
-        parseOnLoad: true,
-      };
-    </script>
     <script src="http://js.arcgis.com/3.6/"></script>
   </head>
   <body class="tundra">
       <div id="map"></div>
-      <div id="controls">
-        <div id="socket">
-          <span>Enter websocket connection: </span><input type="text" id="txtWsUrl" value="ws://ec2-107-21-212-168.compute-1.amazonaws.com:8080/asdiflight" style="width: 400px"/><br/>
-        </div>
-        <input type="button" id="cmdNewStream" value="Stream Flight Paths" />
+      <div>
+        <span>Enter websocket connection: </span><input type="text" id="txtWsUrl" value="ws://ec2-54-224-125-57.compute-1.amazonaws.com:8080/seattlebusservice" style="width: 400px"/><br/>
+        <input type="button" id="cmdNewStream" value="Make Stream Layer" />
         <input type="button" id="cmdDisconnect" value="Disconnect Stream Layer" />
       </div>
   </body>
 
   <script>
-     /*
-      * requirements. Use callback to init the map and set click events for buttons
-      */
+      var curTime = new Date();
+      var curTimeStamp = Date.parse(curTime.toUTCString());
+      var layerDefinition = {
+        "geometryType": "esriGeometryPoint",
+        "timeInfo": {
+          "startTimeField": "DateTimeStamp",
+          "endTimeField": null,
+          "trackIdField": "RouteID",
+          "timeReference": null,
+          "timeInterval": 1,
+          "timeIntervalUnits": "esriTimeUnitsMinutes",
+          "exportOptions": {
+           "useTime": true,
+           "timeDataCumulative": false,
+           "timeOffset": null,
+           "timeOffsetUnits": null
+          },
+          "hasLiveData": true
+         },
+        "fields": [
+          {
+            name: "ObjectId",
+            type: "esriFieldTypeOID",
+            alias: "ObjectId"
+          },
+          {
+            name: "BusNo",
+            type: "esriFieldTypeInteger",
+            alias: "Bus Number"
+          },
+          {
+            name: "Longitude",
+            type: "esriFieldTypeDouble",
+            alias: "Longitude"
+          },
+          {
+            name: "Latitude",
+            type: "esriFieldTypeDouble",
+            alias: "Latitude"
+          },
+          {
+            name: "Altitude",
+            type: "esriFieldTypeDouble",
+            alias: "Altitude"
+          },
+          {
+            name: "DateTimeStamp",
+            type: "esriFieldTypeDate",
+            alias: "DateTimeStamp"
+          },
+          {
+            name: "Heading",
+            type: "esriFieldTypeInteger",
+            alias: "Heading"
+          },
+          {
+            name: "RouteID",
+            type: "esriFieldTypeInteger",
+            alias: "RouteID"
+          }
+        ]
+      };
+
+      var map, featureCollection, streamLayer;
+
       require(["esri/map",
-        "esri/layers/FeatureLayer",
+        "esri/TimeExtent",
         "esri/layers/StreamLayer",
-        "esri/layers/GraphicsLayer",
-        "esri/geometry/Extent",
+        "esri/InfoTemplate",
         "esri/symbols/SimpleMarkerSymbol",
         "esri/symbols/SimpleLineSymbol",
         "esri/renderers/SimpleRenderer",
-        "esri/symbols/SimpleFillSymbol",
-        "esri/graphic",
-        "esri/geometry/Polyline",
-        "esri/geometry/Point",
-        "esri/geometry/jsonUtils",
+        "esri/renderers/TimeClassBreaksAger",
+        "esri/renderers/TemporalRenderer",
         "dojo/_base/Color",
-        "dojo/_base/connect",
+        "dojo/dom",
+        "dojo/on",
         "dojo/domReady!"
-      ], function(Map, FeatureLayer, StreamLayer, GraphicsLayer, Extent, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, SimpleFillSymbol, Graphic, Polyline, Point, jsonUtils, Color, connect){
-          //console.log("In dom ready function");
+      ], function(Map, TimeExtent, StreamLayer, InfoTemplate, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, TimeClassBreaksAger, TemporalRenderer, Color, dom, on){
+          var trackedBusses = {}, cnt = 0;
 
-          var connection,
-            map,
-            flightStreamLayer,
-            flightLayer,
-            trailLayer,
-            tracklineLayer,
-            layerDefinition,
-            TRACK_ID_FIELD = "FltId",
-            MAX_TRAIL = 6,
-            SHOW_TRACKS = true,
-            graphicsColl = {};
-
-          /*
-           * LayerDefinition that defines schema of a flight message.
-           *
-           */
-          layerDefinition = {
-            "geometryType": "esriGeometryPoint",
-            "fields": [
-              {
-                name: "ObjectId",
-                type: "esriFieldTypeOID",
-                alias: "ObjectId"
-              },
-              {
-                name: "AltitudeFeet",
-                type: "esriFieldTypeDouble",
-                alias: "AltitudeFeet"
-              },
-              {
-                name: "deparpt",
-                type: "esriFieldTypeString",
-                alias: "deparpt"
-              },
-              {
-                name: "msgtime",
-                type: "esriFieldTypeDate",
-                alias: "msgtime"
-              },
-              {
-                name: "FltId",
-                type: "esriFieldTypeString",
-                alias: "FltId"
-              },
-              {
-                name: "Heading",
-                type: "esriFieldTypeDouble",
-                alias: "Heading"
-              }
-            ]
-          };
-
-          var bounds = new Extent({
-            "xmin":-16966135.58841464,
-            "ymin":2551913.339721252,
-            "xmax":-4376555.304442507,
-            "ymax":8529100.339721255,
-            "spatialReference":{"wkid":102100}
+          map = new Map("map",{
+            basemap: "gray",
+            center: [-122.402, 47.642],
+            zoom: 10 
           });
 
-          var map = new Map("map", { 
-            extent: bounds
-          });
-          
-          dojo.connect(map, "onExtentChange", function(extent) {
-            // /console.log('extent', extent)
-          });
+          // event listeners for button clicks
+          on(dom.byId("cmdNewStream"), "click", makeNewStreamLayer);
+          on(dom.byId("cmdDisconnect"), "click", disconnectStreamLayer);
 
-          var world = "http://sampleserver6.arcgisonline.com/arcgis/rest/services/WorldTimeZones/MapServer/2";
-
-          var fl = new FeatureLayer(world, {
-            id: "world-regions"
-          });
-          
-          var outline = new SimpleLineSymbol("solid", new Color([100, 100, 100, .5]), 1);
-          var fill = new SimpleFillSymbol("solid", outline, new Color([33, 33, 33 ]));
-          fl.setRenderer(new SimpleRenderer(fill));
-          map.addLayer(fl);
-
-          tracklineLayer = new GraphicsLayer();
-          trailLayer = new GraphicsLayer();
-          flightLayer = new GraphicsLayer();
-          map.addLayer(tracklineLayer);
-          map.addLayer(trailLayer);
-          map.addLayer(flightLayer);
-
-          //test stream layer
-          //flightStreamLayer = makeStreamLayer();
-          //console.log("STREAM LAYER: ", flightStreamLayer);
-          //map.addLayer(flightStreamLayer);
-
-          //connect click events to buttons
-          //connect.connect(dojo.byId("cmdNewStream"), "onclick", connectStreamLayer);
-          connect.connect(dojo.byId("cmdNewStream"), "onclick", connectSocket);
-          connect.connect(dojo.byId("cmdDisconnect"), "onclick", disconnectStreamLayer);
-
-          /*
-           * Functions to make Streamlayer and process messages
-           */
           function makeStreamLayer(){
-            console.log("Making stream layer");
-            var featureCollection,
-            layer,
-            renderer;
-
             //Make FeatureCollection to define layer without using url
             featureCollection = {
             "layerDefinition": null,
@@ -230,256 +135,86 @@
             };
             featureCollection.layerDefinition = layerDefinition;
 
-            /*
-             * Instantiate StreamLayer
-             *
-             * 1. socketUrl is the url to the GeoEvent Processor web socket.
-             * 2. purgeOptions.displayCount is the maximum number of features the
-             *    layer will display at one time
-             * 3. trackIdField is the name of the field that groups features
-             */
-            var layer = new esri.layers.StreamLayer(featureCollection, {
+            // Instantiate StreamLayer
+            // 1. socketUrl is the url to the GeoEvent Processor web socket.
+            // 2. purgeOptions.displayCount is the maximum number of features the
+            //    layer will display at one time
+            // 3. trackIdField is the name of the field that groups features
+            var layer = new StreamLayer(featureCollection, {
               socketUrl: txtWsUrl.value,
-              purgeOptions: { displayCount: 5000 },
-              trackIdField: TRACK_ID_FIELD
+              purgeOptions: { displayCount: 500 },
+              trackIdField: featureCollection.layerDefinition.timeInfo.trackIdField,
+              infoTemplate: new InfoTemplate("Route Id: ${RouteID}", "Timestamp: ${DateTimeStamp}" )
             });
+            console.log("TrackID: ", featureCollection.layerDefinition.timeInfo.trackIdField);
+            console.log("TrackID: ", layer.timeInfo.trackIdField);
 
             //Make renderer and apply it to StreamLayer
             var renderer = makeRenderer();
-            //console.log("RENDERER: ", renderer);
             layer.setRenderer( renderer );
-            console.log("LAYER: ", layer);
-            layer.socket.onmessage = function(e){
-              processMessage(e.data);
-            };
+
             //Subscribe to onMessage event of StreamLayer so can adjust map time
-            connect.connect(layer, 'onMessage', function(msg){
-              console.log("MESSAGE: ", msg);
-            });
+            layer.on("message", processMessage);
             return layer;
           }
 
-          /*
-           * Process message that websocket received. It is stringified Array of Feature JSON
-           */
+          // Process message that StreamLayer received.
           function processMessage(message){
-            var msgarray,
-              feat,
-              geom,
-              addgraphics = [],
-              graphic,
-              g,
-              updates;
-            msgarray = JSON.parse(message);
-            if (! Array.isArray(msgarray)){
-              msgarray = [msgarray];
-            }
-            handleFlightUpdates(msgarray);
-          }
-
-          /*
-           * Handle messages
-           *  1. Add flight info to cache if not currently tracked
-           *  2. Add point to breadcrumb trail and remove old breadcrumbs to keep at or below max
-           *  3. Make track line to show path
-           */
-          function handleFlightUpdates(newFlights){
-            var f,
-              fltgraphicsinfo,
-              fltgraphicsarray,
-              graphic,
-              currentgraphic,
-              firstpos,
-              flightid,
-              g,
-              agesymbol = makeMarker(false),
-              t,
-              maxInTrail,
-              track;
-
-            for (f = 0; f < newFlights.length; f++){
-              //get id of flight and graphics info associated with flight
-              flightid = newFlights[f].attributes[TRACK_ID_FIELD];
-              fltgraphicsinfo = graphicsColl[flightid];
-
-              //if flight is not already being tracked, make oject to store flight info
-              if (! fltgraphicsinfo){
-                currentgraphic = makeCurrentPositionGraphic(newFlights[f]);
-                //flightStreamLayer.add(currentgraphic);
-                flightLayer.add(currentgraphic);
-                graphicsColl[flightid] = {
-                  currentPosition: currentgraphic,
-                  trail: [],
-                  track: null,
-                  updated: new Date()
-                };
-              }
-              else{
-                //add last mapped flight position to breadcrumb trail
-                graphic = makeTrailpointGraphic(fltgraphicsinfo.currentPosition.geometry);
-                trailLayer.add(graphic);
-                fltgraphicsinfo.trail.push(graphic);
-
-                //trim trail if greater than max allowed
-                if (fltgraphicsinfo.trail.length > MAX_TRAIL){
-                  //graphic = fltgraphicsinfo.trail.shift();
-                  //trailLayer.remove(fltgraphicsinfo.trail.shift());
-                }
-
-                //update current position
-                updateCurrentPosition(newFlights[f], fltgraphicsinfo.currentPosition);
-
-                 //make line to show track
-                track = makeTrackLine(fltgraphicsinfo.track, fltgraphicsinfo.trail, fltgraphicsinfo.currentPosition);
-                if (track && ! fltgraphicsinfo.track){
-                  fltgraphicsinfo.track = track;
-                  tracklineLayer.add(track);
+            if (featureCollection.layerDefinition.timeInfo && 
+                featureCollection.layerDefinition.timeInfo.startTimeField) {
+              var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
+              if (! map.timeExtent){
+                map.setTimeExtent(new esri.TimeExtent(new Date(timestamp), new Date(timestamp)));
+                console.log("TIME EXTENT: ", map.timeExtent);
+              } else {
+                var tsEnd = Date.parse(map.timeExtent.endTime.toString());
+                if (timestamp > tsEnd){
+                  map.setTimeExtent(new esri.TimeExtent(map.timeExtent.startTime, new Date(timestamp)));
+                  console.log("TIME EXTENT: ", map.timeExtent);
                 }
               }
             }
           }
 
-          function makeCurrentPositionGraphic(jsonFeature){
-            var geom,
-              graphic;
-
-            geom = jsonUtils.fromJson(jsonFeature.geometry);
-            graphic = new Graphic(geom, makeMarker(true), jsonFeature.attributes);
-            return graphic;
-          }
-
-          function makeTrailpointGraphic(jsGeometry){
-            var graphic = new Graphic(jsGeometry, makeMarker(false), null);
-            return graphic;
-          }
-
-          function updateCurrentPosition(jsonFeature, currentPosition){
-            var geom = jsonUtils.fromJson(jsonFeature.geometry);
-            currentPosition.setGeometry(geom);
-          }
-
-          function makeTrackLine(currentLineGraphic, trackPointGraphics, currentPositionGraphic){
-            var track,
-              line,
-              path =[],
-              pathlength,
-              p,
-              pt;
-
-            if (! trackPointGraphics || trackPointGraphics.length === 0){
-              return false;
-            }
-
-            pathlength = trackPointGraphics.length;
-            if (! currentLineGraphic){
-              currentLineGraphic = new Graphic();
-              currentLineGraphic.setSymbol(makeLineSymbol());
-            }
-
-            line = new Polyline(trackPointGraphics[0].spatialReference);
-            for (p = 0; p < pathlength; p++){
-              pt = new Point(trackPointGraphics[p].geometry.x, trackPointGraphics[p].geometry.y);
-              path.push(pt);
-            }
-
-            pt = new Point(currentPositionGraphic.geometry.x, currentPositionGraphic.geometry.y);
-            path.push(pt)
-            line.addPath(path);
-            currentLineGraphic.setGeometry(line);
-            return currentLineGraphic;
-          }
-
-          function connectStreamLayer(){
+          // Make new StreamLayer and add it to map.
+          function makeNewStreamLayer(){
             disconnectStreamLayer();
-            if (! flightStreamLayer){
-              flightStreamLayer = makeStreamLayer();
-              map.addLayer(flightStreamLayer);
-            }
-            else{
-              flightStreamLayer.connect();
-            }
-            //connectSocket();
+            streamLayer = makeStreamLayer();
+            map.addLayer( streamLayer );
           }
 
-          /*
-           * Disconnect StreamLayer from websocket and remove it from the map.
-           * Also clear graphics from map
-           */
+          // Disconnect StreamLayer from websocket and remove it from the map
           function disconnectStreamLayer(){
-            if (flightStreamLayer){
-              flightStreamLayer.suspend();
-              flightStreamLayer.disconnect();
-              flightStreamLayer.clear();
-              map.removeLayer(flightStreamLayer);
-              flightStreamLayer = null;
-              graphicsColl = {};
-              trailLayer.clear();
-              tracklineLayer.clear();
-            }
-            if (connection){
-              disconnectSocket();
-              flightLayer.clear();
-              trailLayer.clear();
-              tracklineLayer.clear();
-              graphicsColl = {};
+            if (streamLayer){
+              streamLayer.suspend();
+              streamLayer.disconnect();
+              streamLayer.clear();
+              map.removeLayer(streamLayer);
+              streamLayer = null;
+              //map.timeExtent = null;
             }
           }
 
-          function connectSocket(){
-            if ("WebSocket" in window){
-              console.log("WebSocket supported");
-              var host = document.getElementById("txtWsUrl").value;
-              connection = new WebSocket(host);
-              connection.onopen = function(){
-                console.log("Opened web socket");
-              };
-              connection.onclose = function(m){
-                console.log("Closed web socket",m);
-                connection = null;
-              };
-              connection.onerror = function(err){
-                console.log("Error: ", err);
-                connection = null;
-              };
-              connection.onmessage = function(e){
-                processMessage(e.data);
-              };
-            }
-            else{
-              console.log("WebSocket not supported");
-            }
-          }
-
-          function disconnectSocket(){
-            connection.close();
-          }
-
+          // Make temporal renderer with latest observation renderer
           function makeRenderer(){
-            var marker = makeMarker(true),
-              obsRenderer = new SimpleRenderer(marker);
-            return obsRenderer;
-          }
+            var obsRenderer = new SimpleRenderer(
+              new SimpleMarkerSymbol("circle", 8,
+              new SimpleLineSymbol("solid",
+              new Color( [5, 112, 176, 0] ), 1),
+              new Color( [5, 112, 176, 0.4] )
+            ));
 
-          /*
-           * Make marker symbol
-           */
-          function makeMarker(current){
-            var color = current ? new Color([255,255,255, 0.8]) : new Color([240,240,240, 0.5]),
-              size = current ? 4 : 1,
-              marker = new SimpleMarkerSymbol();
-            marker.setSize(size);
-            marker.setColor(color);
-            marker.setOutline(null);
-            marker.setStyle("circle");
-            return marker;
-          }
+            var latestObsRenderer = new SimpleRenderer(
+              new SimpleMarkerSymbol("circle", 12,
+              new SimpleLineSymbol("solid",
+              new Color( [5, 112, 176, 0] ), 1),
+              new Color( [5, 112, 176] )
+            ));
 
-          function makeLineSymbol(){
-            var color = new Color([59,163,208,0.8]),
-              sls = new SimpleLineSymbol("solid", color, 0.6);
-             return sls;
+            var temporalRenderer = new TemporalRenderer(obsRenderer, latestObsRenderer, null, null);
+            return temporalRenderer;
           }
         });
   </script>
 
-</html>
+</html> 
