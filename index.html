@@ -140,6 +140,7 @@
 
           // Process message that StreamLayer received.
           function processMessage(message){
+            console.log('bip');
             if (featureCollection.layerDefinition.timeInfo && 
                 featureCollection.layerDefinition.timeInfo.startTimeField) {
               var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
