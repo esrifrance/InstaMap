@@ -60,39 +60,14 @@
             alias: "ObjectId"
           },
           {
-            name: "BusNo",
-            type: "esriFieldTypeInteger",
-            alias: "Bus Number"
+            name: "link",
+            type: "esriFieldTypeString",
+            alias: "link"
           },
           {
-            name: "Longitude",
-            type: "esriFieldTypeDouble",
-            alias: "Longitude"
-          },
-          {
-            name: "Latitude",
-            type: "esriFieldTypeDouble",
-            alias: "Latitude"
-          },
-          {
-            name: "Altitude",
-            type: "esriFieldTypeDouble",
-            alias: "Altitude"
-          },
-          {
-            name: "DateTimeStamp",
-            type: "esriFieldTypeDate",
-            alias: "DateTimeStamp"
-          },
-          {
-            name: "Heading",
-            type: "esriFieldTypeInteger",
-            alias: "Heading"
-          },
-          {
-            name: "RouteID",
-            type: "esriFieldTypeInteger",
-            alias: "RouteID"
+            name: "username",
+            type: "esriFieldTypeString",
+            alias: "username"
           }
         ]
       };
@@ -118,7 +93,7 @@
           map = new Map("map",{
             basemap: "gray",
             center: [-122.402, 47.642],
-            zoom: 10 
+            zoom: 6 
           });
 
           // event listeners for button clicks
