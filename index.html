@@ -27,7 +27,7 @@
   <body class="tundra">
       <div id="map"></div>
       <div>
-        <span>Enter websocket connection: </span><input type="text" id="txtWsUrl" value="ws://ec2-54-224-125-57.compute-1.amazonaws.com:8080/seattlebusservice" style="width: 400px"/><br/>
+        <span>Enter websocket connection: </span><input type="text" id="txtWsUrl" value="ws://88.190.45.92:6180/instaws" style="width: 400px"/><br/>
         <input type="button" id="cmdNewStream" value="Make Stream Layer" />
         <input type="button" id="cmdDisconnect" value="Disconnect Stream Layer" />
       </div>
@@ -41,7 +41,7 @@
         "timeInfo": {
           "startTimeField": "DateTimeStamp",
           "endTimeField": null,
-          "trackIdField": "RouteID",
+          "trackIdField": "link",
           "timeReference": null,
           "timeInterval": 1,
           "timeIntervalUnits": "esriTimeUnitsMinutes",
@@ -63,6 +63,11 @@
             name: "link",
             type: "esriFieldTypeString",
             alias: "link"
+          },
+          {
+            name: "DateTimeStamp",
+            type: "esriFieldTypeDate",
+            alias: "DateTimeStamp"
           },
           {
             name: "username",
@@ -119,7 +124,7 @@
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
               trackIdField: featureCollection.layerDefinition.timeInfo.trackIdField,
-              infoTemplate: new InfoTemplate("Route Id: ${RouteID}", "Timestamp: ${DateTimeStamp}" )
+              infoTemplate: new InfoTemplate("username: ${username}", "link: ${link}", "Timestamp: ${DateTimeStamp}" )
             });
             console.log("TrackID: ", featureCollection.layerDefinition.timeInfo.trackIdField);
             console.log("TrackID: ", layer.timeInfo.trackIdField);
