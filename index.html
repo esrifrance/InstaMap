@@ -129,7 +129,8 @@
             console.log("TrackID: ", featureCollection.layerDefinition.timeInfo.trackIdField);
             console.log("TrackID: ", layer.timeInfo.trackIdField);
 
-            console.log("CONNECTED SOCKET: ", layer);
+            layer.on("Connect", function() {
+              console.log("CONNECTED SOCKET: ", layer);}
 
             //Make renderer and apply it to StreamLayer
             var renderer = makeRenderer();
