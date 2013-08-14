@@ -39,7 +39,7 @@
       var layerDefinition = {
         "geometryType": "esriGeometryPoint",
         "timeInfo": {
-          "startTimeField": "DateTimeStamp",
+          "startTimeField": "DateStamp",
           "endTimeField": null,
           "trackIdField": "link",
           "timeReference": null,
@@ -60,9 +60,9 @@
             alias: "ObjectId"
           },
           {
-            name: "DateTimeStamp",
+            name: "DateStamp",
             type: "esriFieldTypeDate",
-            alias: "DateTimeStamp"
+            alias: "DateStamp"
           },
           {
             name: "link",
@@ -77,7 +77,8 @@
         ]
       };
 
-      var map, featureCollection, streamLayer;
+      var map, featureCollection, streamLayer,nbmsg;
+      nbmsg=0;
 
       require(["esri/map",
         "esri/TimeExtent",
@@ -124,13 +125,9 @@
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
               trackIdField: featureCollection.layerDefinition.timeInfo.trackIdField,
-              infoTemplate: new InfoTemplate("username: ${username}", "link: ${link}", "Timestamp: ${DateTimeStamp}" )
+              infoTemplate: new InfoTemplate("username: ${Username}", "link: ${Link}", "Timestamp: ${DateStamp}" )
             });
-            console.log("TrackID: ", featureCollection.layerDefinition.timeInfo.trackIdField);
-            console.log("TrackID: ", layer.timeInfo.trackIdField);
-
-            layer.on("Connect", function() {
-              console.log("CONNECTED SOCKET: ", layer);});
+    
 
             //Make renderer and apply it to StreamLayer
             var renderer = makeRenderer();
@@ -143,18 +140,17 @@
 
           // Process message that StreamLayer received.
           function processMessage(message){
-            console.log('bip'); 
+            nbmsg=nbmsg+1;
+            console.log(nbmsg);
             if (featureCollection.layerDefinition.timeInfo && 
                 featureCollection.layerDefinition.timeInfo.startTimeField) {
               var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
               if (! map.timeExtent){
                 map.setTimeExtent(new esri.TimeExtent(new Date(timestamp), new Date(timestamp)));
-                console.log("TIME EXTENT: ", map.timeExtent);
               } else {
                 var tsEnd = Date.parse(map.timeExtent.endTime.toString());
                 if (timestamp > tsEnd){
                   map.setTimeExtent(new esri.TimeExtent(map.timeExtent.startTime, new Date(timestamp)));
-                  console.log("TIME EXTENT: ", map.timeExtent);
                 }
               }
             }
@@ -189,7 +185,7 @@
             ));
 
             var latestObsRenderer = new SimpleRenderer(
-              new SimpleMarkerSymbol("circle", 12,
+              new SimpleMarkerSymbol("circle", 16,
               new SimpleLineSymbol("solid",
               new Color( [5, 112, 176, 0] ), 1),
               new Color( [5, 112, 176] )
