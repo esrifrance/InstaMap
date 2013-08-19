@@ -161,20 +161,6 @@
               //map.timeExtent = null;
             }
           }
-
-          // Make temporal renderer with latest observation renderer
-          function makeRenderer(){
-            var obsRenderer = new SimpleRenderer(
-              new PictureMarkerSymbol("./insta.png",16,16)
-            );
-
-            var latestObsRenderer = new SimpleRenderer(
-              new PictureMarkerSymbol("./insta.png",24,24)
-            );
-
-            var temporalRenderer = new TemporalRenderer(obsRenderer, latestObsRenderer, null, null);
-            return temporalRenderer;
-          }
         });
   </script>
 
