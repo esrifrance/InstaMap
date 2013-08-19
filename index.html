@@ -34,8 +34,8 @@
   </body>
 
   <script>
-      var curTime = new Date();
-      var curTimeStamp = Date.parse(curTime.toUTCString());
+      //var curTime = new Date();
+      //var curTimeStamp = Date.parse(curTime.toUTCString());
       var layerDefinition = {
           "geometryType": "esriGeometryPoint",
           "hasLiveData": true,
@@ -66,19 +66,19 @@
       var map, featureCollection, streamLayer;
 
       require(["esri/map",
-        "esri/TimeExtent",
+        //"esri/TimeExtent",
         "esri/layers/StreamLayer",
         "esri/InfoTemplate",
         "esri/symbols/PictureMarkerSymbol",
-        "esri/symbols/SimpleLineSymbol",
-        "esri/renderers/SimpleRenderer",
-        "esri/renderers/TimeClassBreaksAger",
-        "esri/renderers/TemporalRenderer",
-        "dojo/_base/Color",
-        "dojo/dom",
-        "dojo/on",
-        "dojo/domReady!"
-      ], function(Map, TimeExtent, StreamLayer, InfoTemplate, PictureMarkerSymbol, SimpleLineSymbol, SimpleRenderer, TimeClassBreaksAger, TemporalRenderer, Color, dom, on){
+        //"esri/symbols/SimpleLineSymbol",
+        //"esri/renderers/SimpleRenderer",
+        //"esri/renderers/TimeClassBreaksAger",
+        //"esri/renderers/TemporalRenderer",
+        //"dojo/_base/Color",
+        //"dojo/dom",
+        //"dojo/on",
+        //"dojo/domReady!"
+      ], function(Map, StreamLayer, InfoTemplate, PictureMarkerSymbol){
           map = new Map("map",{
             basemap: "gray",
             center: [-30.402, 45.642],
@@ -86,10 +86,11 @@
           });
           map.infoWindow.resize(330,330);
 
-
+          makeNewStreamLayer;
+          
           // event listeners for button clicks
-          on(dom.byId("cmdNewStream"), "click", makeNewStreamLayer);
-          on(dom.byId("cmdDisconnect"), "click", disconnectStreamLayer);
+          //on(dom.byId("cmdNewStream"), "click", makeNewStreamLayer);
+          //on(dom.byId("cmdDisconnect"), "click", disconnectStreamLayer);
 
           function makeStreamLayer(){
             featureCollection = {
