@@ -117,16 +117,10 @@
             var layer = new StreamLayer(featureCollection, {
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
-              trackIdField: "Link"
+              trackIdField: "Link",
               infoTemplate: new InfoTemplate("Published by ${Username}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
             });
-    
 
-            //Make renderer and apply it to StreamLayer
-            //var renderer = makeRenderer();
-            //layer.setRenderer( renderer );
-
-            //Subscribe to onMessage event of StreamLayer so can adjust map time
             layer.on("message", processMessage);
             return layer;
           }
