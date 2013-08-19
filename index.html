@@ -93,8 +93,6 @@
         "dojo/on",
         "dojo/domReady!"
       ], function(Map, TimeExtent, StreamLayer, InfoTemplate, PictureMarkerSymbol, SimpleLineSymbol, SimpleRenderer, TimeClassBreaksAger, TemporalRenderer, Color, dom, on){
-          var trackedBusses = {}, cnt = 0;
-
           map = new Map("map",{
             basemap: "gray",
             center: [-30.402, 45.642],
@@ -117,15 +115,10 @@
             };
             featureCollection.layerDefinition = layerDefinition;
 
-            // Instantiate StreamLayer
-            // 1. socketUrl is the url to the GeoEvent Processor web socket.
-            // 2. purgeOptions.displayCount is the maximum number of features the
-            //    layer will display at one time
-            // 3. trackIdField is the name of the field that groups features
             var layer = new StreamLayer(featureCollection, {
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
-              trackIdField: featureCollection.layerDefinition.timeInfo.trackIdField,
+              trackIdField: "Link" //featureCollection.layerDefinition.timeInfo.trackIdField,
               infoTemplate: new InfoTemplate("Published by ${Username} on ${DateStamp}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
             });
     
