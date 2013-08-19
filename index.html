@@ -129,18 +129,18 @@
           function processMessage(message){
             var miniPicture = new PictureMarkerSymbol(message.graphic.attributes["Link"]+"media", 30, 30);
             message.graphic.setSymbol(miniPicture);
-            if (featureCollection.layerDefinition.timeInfo && 
-                featureCollection.layerDefinition.timeInfo.startTimeField) {
-              var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
-              if (! map.timeExtent){
-                map.setTimeExtent(new esri.TimeExtent(new Date(timestamp), new Date(timestamp)));
-              } else {
-                var tsEnd = Date.parse(map.timeExtent.endTime.toString());
-                if (timestamp > tsEnd){
-                  map.setTimeExtent(new esri.TimeExtent(map.timeExtent.startTime, new Date(timestamp)));
-                }
-              }
-            }
+            //if (featureCollection.layerDefinition.timeInfo && 
+            //    featureCollection.layerDefinition.timeInfo.startTimeField) {
+            //  var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
+            //  if (! map.timeExtent){
+            //    map.setTimeExtent(new esri.TimeExtent(new Date(timestamp), new Date(timestamp)));
+            //  } else {
+            //    var tsEnd = Date.parse(map.timeExtent.endTime.toString());
+            //    if (timestamp > tsEnd){
+            //      map.setTimeExtent(new esri.TimeExtent(map.timeExtent.startTime, new Date(timestamp)));
+            //    }
+            //  }
+            //}
           }
 
           // Make new StreamLayer and add it to map.
