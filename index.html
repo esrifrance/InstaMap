@@ -103,6 +103,7 @@
             });
 
             layer.on("message", processMessage);
+
             return layer;
           }
 
@@ -112,14 +113,12 @@
 
           }
 
-          // Make new StreamLayer and add it to map.
           function makeNewStreamLayer(){
             disconnectStreamLayer();
             streamLayer = makeStreamLayer();
             map.addLayer( streamLayer );
           }
 
-          // Disconnect StreamLayer from websocket and remove it from the map
           function disconnectStreamLayer(){
             if (streamLayer){
               streamLayer.suspend();
@@ -127,7 +126,6 @@
               streamLayer.clear();
               map.removeLayer(streamLayer);
               streamLayer = null;
-              //map.timeExtent = null;
             }
           }
         });
