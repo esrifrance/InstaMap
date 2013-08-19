@@ -93,11 +93,12 @@
 
           function makeStreamLayer(){
             featureCollection = {
-            "layerDefinition": layerDefinition,
-            "featureSet": null}
+            "layerDefinition": null,
+            "featureSet": {
+              "features": [],
+              "geometryType": "esriGeometryPoint"}
             };
-            //featureCollection.layerDefinition = layerDefinition;
-
+            featureCollection.layerDefinition = layerDefinition;
             var layer = new StreamLayer(featureCollection, {
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
