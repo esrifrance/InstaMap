@@ -18,7 +18,7 @@
       }
       #map {
         width: 100%;
-        height: 80%;
+        height: 95%;
       }
 
     </style>
@@ -27,9 +27,9 @@
   <body class="tundra">
       <div id="map"></div>
       <div>
-        <span>Enter websocket connection: </span><input type="text" id="txtWsUrl" value="ws://88.190.45.92:6180/instaws" style="width: 400px"/><br/>
-        <input type="button" id="cmdNewStream" value="Make Stream Layer" />
-        <input type="button" id="cmdDisconnect" value="Disconnect Stream Layer" />
+        <span>Connexion WebSocket à GeoEvent Processor: </span><input type="text" id="txtWsUrl" value="ws://88.190.45.92:6180/instaws" style="width: 400px"/><br/>
+        <input type="button" id="cmdNewStream" value="Se connecter au flux Instagram" />
+        <input type="button" id="cmdDisconnect" value="Se déconnecter du flux Instagram" />
       </div>
   </body>
 
@@ -77,14 +77,13 @@
         ]
       };
 
-      var map, featureCollection, streamLayer,nbmsg;
-      nbmsg=0;
+      var map, featureCollection, streamLayer;
 
       require(["esri/map",
         "esri/TimeExtent",
         "esri/layers/StreamLayer",
         "esri/InfoTemplate",
-        "esri/symbols/SimpleMarkerSymbol",
+        "esri/symbols/PictureMarkerSymbol",
         "esri/symbols/SimpleLineSymbol",
         "esri/renderers/SimpleRenderer",
         "esri/renderers/TimeClassBreaksAger",
@@ -93,14 +92,16 @@
         "dojo/dom",
         "dojo/on",
         "dojo/domReady!"
-      ], function(Map, TimeExtent, StreamLayer, InfoTemplate, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, TimeClassBreaksAger, TemporalRenderer, Color, dom, on){
+      ], function(Map, TimeExtent, StreamLayer, InfoTemplate, PictureMarkerSymbol, SimpleLineSymbol, SimpleRenderer, TimeClassBreaksAger, TemporalRenderer, Color, dom, on){
           var trackedBusses = {}, cnt = 0;
 
           map = new Map("map",{
             basemap: "gray",
-            center: [-122.402, 47.642],
-            zoom: 6 
+            center: [-30.402, 45.642],
+            zoom: 3 
           });
+          map.infoWindow.resize(330,330);
+
 
           // event listeners for button clicks
           on(dom.byId("cmdNewStream"), "click", makeNewStreamLayer);
@@ -125,7 +126,7 @@
               socketUrl: txtWsUrl.value,
               purgeOptions: { displayCount: 500 },
               trackIdField: featureCollection.layerDefinition.timeInfo.trackIdField,
-              infoTemplate: new InfoTemplate("username: ${Username}", "link: ${Link}", "Timestamp: ${DateStamp}" )
+              infoTemplate: new InfoTemplate("Published by ${Username} on ${DateStamp}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
             });
     
 
@@ -140,8 +141,6 @@
 
           // Process message that StreamLayer received.
           function processMessage(message){
-            nbmsg=nbmsg+1;
-            console.log(nbmsg);
             if (featureCollection.layerDefinition.timeInfo && 
                 featureCollection.layerDefinition.timeInfo.startTimeField) {
               var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
@@ -178,18 +177,12 @@
           // Make temporal renderer with latest observation renderer
           function makeRenderer(){
             var obsRenderer = new SimpleRenderer(
-              new SimpleMarkerSymbol("circle", 8,
-              new SimpleLineSymbol("solid",
-              new Color( [5, 112, 176, 0] ), 1),
-              new Color( [5, 112, 176, 0.4] )
-            ));
+              new PictureMarkerSymbol("./insta.png",16,16)
+            );
 
             var latestObsRenderer = new SimpleRenderer(
-              new SimpleMarkerSymbol("circle", 16,
-              new SimpleLineSymbol("solid",
-              new Color( [5, 112, 176, 0] ), 1),
-              new Color( [5, 112, 176] )
-            ));
+              new PictureMarkerSymbol("./insta.png",24,24)
+            );
 
             var temporalRenderer = new TemporalRenderer(obsRenderer, latestObsRenderer, null, null);
             return temporalRenderer;
