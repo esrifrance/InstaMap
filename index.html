@@ -37,23 +37,9 @@
       var curTime = new Date();
       var curTimeStamp = Date.parse(curTime.toUTCString());
       var layerDefinition = {
-        "geometryType": "esriGeometryPoint",
-        //"timeInfo": {
-        //  "startTimeField": "DateStamp",
-        //  "endTimeField": null,
-        //  "trackIdField": "link",
-        //  "timeReference": null,
-        //  "timeInterval": 1,
-        //  "timeIntervalUnits": "esriTimeUnitsMinutes",
-        //  "exportOptions": {
-        //   "useTime": true,
-        //   "timeDataCumulative": false,
-        //   "timeOffset": null,
-        //   "timeOffsetUnits": null
-        //  },
-          "hasLiveData": true
-         },
-        "fields": [
+          "geometryType": "esriGeometryPoint",
+          "hasLiveData": true,
+          "fields": [
           {
             name: "ObjectId",
             type: "esriFieldTypeOID",
@@ -107,12 +93,10 @@
 
           function makeStreamLayer(){
             featureCollection = {
-            "layerDefinition": null,
-            "featureSet": {
-              "features": [],
-              "geometryType": "esriGeometryPoint"}
+            "layerDefinition": layerDefinition,
+            "featureSet": null}
             };
-            featureCollection.layerDefinition = layerDefinition;
+            //featureCollection.layerDefinition = layerDefinition;
 
             var layer = new StreamLayer(featureCollection, {
               socketUrl: txtWsUrl.value,
@@ -125,22 +109,10 @@
             return layer;
           }
 
-          // Process message that StreamLayer received.
           function processMessage(message){
             var miniPicture = new PictureMarkerSymbol(message.graphic.attributes["Link"]+"media", 30, 30);
             message.graphic.setSymbol(miniPicture);
-            //if (featureCollection.layerDefinition.timeInfo && 
-            //    featureCollection.layerDefinition.timeInfo.startTimeField) {
-            //  var timestamp = message.graphic.attributes[featureCollection.layerDefinition.timeInfo.startTimeField];
-            //  if (! map.timeExtent){
-            //    map.setTimeExtent(new esri.TimeExtent(new Date(timestamp), new Date(timestamp)));
-            //  } else {
-            //    var tsEnd = Date.parse(map.timeExtent.endTime.toString());
-            //    if (timestamp > tsEnd){
-            //      map.setTimeExtent(new esri.TimeExtent(map.timeExtent.startTime, new Date(timestamp)));
-            //    }
-            //  }
-            //}
+
           }
 
           // Make new StreamLayer and add it to map.
