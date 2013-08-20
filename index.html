@@ -108,10 +108,8 @@
           }
 
           function processMessage(message){
-            var miniPicture = new PictureMarkerSymbol(message.graphic.attributes["Link"]+"media", 30, 30);
+            var miniPicture = new PictureMarkerSymbol(message.graphic.attributes["Link"]+"media", 25, 25);
             message.graphic.setSymbol(miniPicture);
-            console.log(message.graphic.geometry)
-
           }
 
           function makeNewStreamLayer(){
