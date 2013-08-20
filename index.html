@@ -103,7 +103,8 @@
             });
 
             layer.on("message", processMessage);
-            layer.on("mouse-over", function (e){console.log(e);e.graphic.symbol.setHeight(60);e.graphic.symbol.setWidth(60);} );
+            layer.on("mouse-over", function (e){e.graphic.symbol.setHeight(60);e.graphic.symbol.setWidth(60);graphic.setGeometry(graphic.geometry);} );
+            layer.on("mouse-out", function (e){e.graphic.symbol.setHeight(25);e.graphic.symbol.setWidth(25);graphic.setGeometry(graphic.geometry);} );
 
             return layer;
           }
