@@ -97,7 +97,7 @@
             featureCollection.layerDefinition = layerDefinition;
             var layer = new StreamLayer(featureCollection, {
               socketUrl: "ws://88.190.45.92:6180/instaws",
-              purgeOptions: { displayCount: 500 },
+              purgeOptions: { displayCount: 1000 },
               trackIdField: "Link",
               infoTemplate: new InfoTemplate("Published by ${Username}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
             });
