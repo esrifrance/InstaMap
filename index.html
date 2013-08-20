@@ -103,6 +103,7 @@
             });
 
             layer.on("message", processMessage);
+            layer.on("mouse-over", function (){alert("over");} );
 
             return layer;
           }
