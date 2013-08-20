@@ -110,6 +110,7 @@
           function processMessage(message){
             var miniPicture = new PictureMarkerSymbol(message.graphic.attributes["Link"]+"media", 30, 30);
             message.graphic.setSymbol(miniPicture);
+            console.log(message.graphic.geometry)
 
           }
 
