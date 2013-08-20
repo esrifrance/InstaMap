@@ -103,7 +103,7 @@
             });
 
             layer.on("message", processMessage);
-            layer.on("mouse-over", function (e){e.graphic.symbol.setSize(60);} );
+            layer.on("mouse-over", function (e){console.log(e);e.graphic.symbol.setSize(60);} );
 
             return layer;
           }
