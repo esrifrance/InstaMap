@@ -79,7 +79,7 @@
             center: [-30.402, 45.642],
             zoom: 3 
           });
-          map.infoWindow.resize(330,330);
+          //map.infoWindow.resize(330,330);
 
           makeNewStreamLayer();
 
@@ -98,13 +98,14 @@
             var layer = new StreamLayer(featureCollection, {
               socketUrl: "ws://88.190.45.92:6180/instaws",
               purgeOptions: { displayCount: 1000 },
-              trackIdField: "Link",
-              infoTemplate: new InfoTemplate("Published by ${Username}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
+              trackIdField: "Link"//,
+              //infoTemplate: new InfoTemplate("Published by ${Username}", "<a href=${Link} target=_blank><img src=${Link}media ></a>")
             });
 
             layer.on("message", processMessage);
-            layer.on("mouse-over", function (e){e.graphic.symbol.setHeight(60);e.graphic.symbol.setWidth(60);graphic.setGeometry(graphic.geometry);} );
-            layer.on("mouse-out", function (e){e.graphic.symbol.setHeight(25);e.graphic.symbol.setWidth(25);graphic.setGeometry(graphic.geometry);} );
+            layer.on("mouse-over", function (e){e.graphic.symbol.setHeight(150);e.graphic.symbol.setWidth(150);e.graphic.setGeometry(e.graphic.geometry);} );
+            layer.on("mouse-out", function (e){e.graphic.symbol.setHeight(25);e.graphic.symbol.setWidth(25);e.graphic.setGeometry(e.graphic.geometry);} );
+            layer.on("mouse-down", function (e){window.open(e.graphic.attributes["Link"],'_blank');} );
 
             return layer;
           }
