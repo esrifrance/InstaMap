@@ -16,6 +16,6 @@ Some GeoEvent Processor / Instagram resources :
 - <a href="https://github.com/Esri/instagram-for-geoevent" target='_blank'>The Instagram connector on Esri's Github</a>
 - <a href="http://www.arcgis.com/home/item.html?id=4e33fdcd50f8493286973d412c6c73ba" target='_blank'>The tutorial to the Instagram connector on ArcGIS Online</a>
 
-<a href="http://esrifrance.github.io/Instamap/">Back to the repo !</a>
+<a href="http://www.github.com/esrifrance/Instamap/">Back to the repo !</a>
 
 Author : Christophe Tourret / <a href="http://twitter.com/ChrisTourret">@ChrisTourret</a>
