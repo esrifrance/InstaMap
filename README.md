@@ -1,12 +1,17 @@
-Typeahead.js on ArcGIS
-===================
+Instagram Live Mapper
+=====================
 
-This little example demonstrate how to use this fantastic autocomplete search tool on ArcGIS Online feature services.
+This little demo shows how to implement a live Instagram feed on an ArcGIS Js map.
 
-The purpose here is to search multiple feature services from the same <Input>, display filtered results and once the selection done, get the essential information to do something with the selection, here we choose to get back the ObjectID of the selection, along with the selection's dataset of course. One could think about getting the features geometries from ArcGIS Online et use them right away after selection to zoom on the selected data...
+How does it work ?
 
-Next we'll add a map to the App !
+- Esri has just release an Instagram Connector for the New GeoEvent Processor Extension to ArcGIS for Server 10.2. With this connecteur and the GEP, one is able to connect to the popular media feed from the Instagram API and publish it as a live service of geo features on a Web Socket endpoint.
+- The new version (3.6) of the ArcGIS Javascript API introduces Streamlayers. Streamlayers are map layers that are sourced from a live feed of geo features on a web socket endpoint. The feature just appear on the map as they are feeded to the web socket.
 
-<a href="http://esrifrance.github.io/Typeahead-on-ArcGIS/">Let's play with the demo !</a>
+This demo is built on this architecture : Instagram -> ArcGIS Server/GeoEvent Processor -> Js App
+
+At this time the Instagram connector to GeoEvent Processor seems hardcoded to the Instagram popular media feed, so be prepared for fashionistas, nail art, reality show heroes, ...
+
+<a href="http://esrifrance.github.io/Instamap/">Let's play with the demo !</a>
 
 Author : Christophe Tourret / <a href="http://twitter.com/ChrisTourret">@ChrisTourret</a>
