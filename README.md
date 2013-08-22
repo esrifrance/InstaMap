@@ -13,8 +13,8 @@ This demo is built on this architecture : Instagram -> ArcGIS Server/GeoEvent Pr
 At this time the Instagram connector to GeoEvent Processor seems hardcoded to the Instagram popular media feed, so be prepared for fashionistas, nail art, reality show heroes, ...
 
 Some GeoEvent Processor / Instagram resources :
-- <a href="https://github.com/Esri/instagram-for-geoevent target='_blank'">The Instagram connector on Esri's Github</a>
-- <a href="http://www.arcgis.com/home/item.html?id=4e33fdcd50f8493286973d412c6c73ba target='_blank'">The tutorial to the Instagram connector on ArcGIS Online</a>
+- <a href="https://github.com/Esri/instagram-for-geoevent" target='_blank'>The Instagram connector on Esri's Github</a>
+- <a href="http://www.arcgis.com/home/item.html?id=4e33fdcd50f8493286973d412c6c73ba" target='_blank'>The tutorial to the Instagram connector on ArcGIS Online</a>
 
 <a href="http://esrifrance.github.io/Instamap/" target='_blank'>Let's play with the demo !</a>
 
