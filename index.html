@@ -7,7 +7,6 @@
     <title>Instagram ArcGIS Streamlayer via ArcGIS GeoEvent Processor</title>
     <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/dojo/dijit/themes/tundra/tundra.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
-    <link rel="shortcut icon" type="image/x-icon" href="http://www.arcgis.com/favicon.ico">
     <style type="text/css">
       html, body {
         height: 100%; width: 100%;
@@ -59,11 +58,11 @@
 
       var map, featureCollection, streamLayer;
 
-      require(["esri/map",
+      require(["dojo/_base/event","esri/map",
         "esri/layers/StreamLayer",
         "esri/InfoTemplate",
-        "esri/symbols/PictureMarkerSymbol",
-      ], function(Map, StreamLayer, InfoTemplate, PictureMarkerSymbol){
+        "esri/symbols/PictureMarkerSymbol"
+      ], function(event, Map, StreamLayer, InfoTemplate, PictureMarkerSymbol){
           map = new Map("map",{
             basemap: "gray",
             center: [-30.402, 45.642],
@@ -89,7 +88,7 @@
             layer.on("message", processMessage);
             layer.on("mouse-over", function (e){e.graphic.symbol.setHeight(150);e.graphic.symbol.setWidth(150);e.graphic.setGeometry(e.graphic.geometry);} );
             layer.on("mouse-out", function (e){e.graphic.symbol.setHeight(25);e.graphic.symbol.setWidth(25);e.graphic.setGeometry(e.graphic.geometry);} );
-            //layer.on("mouse-down", function (e){window.open(e.graphic.attributes["Link"],'_blank');} );
+            layer.on("click", function (e){event.stop(e);window.open(e.graphic.attributes["Link"],'_blank');} );
 
             return layer;
           }
